@@ -13,25 +13,25 @@ const cardSchema = new Schema<ICard>({
     type: String,
     minlength: 2,
     maxlength: 30,
-    required: true
+    required: true,
   },
   link: {
     type: String,
-    required: true
+    required: true,
   },
   owner: {
     type: Schema.Types.ObjectId,
-    required: true
+    required: true,
   },
   likes: {
     type: [Schema.Types.ObjectId],
     default: [],
-    required: true
+    required: true,
   },
   createdAt: {
     type: Date,
-    default: Date.now()
-  }
+    default: Date.now(),
+  },
 });
 
 export default model<ICard>('card', cardSchema);

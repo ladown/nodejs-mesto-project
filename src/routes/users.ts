@@ -5,7 +5,7 @@ import {
   getUserById,
   getUsers,
   updateUserAvatar,
-  updateUserProfile
+  updateUserProfile,
 } from '../controllers/users';
 
 const userRouter = Router();

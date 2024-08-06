@@ -5,7 +5,7 @@ import {
   deleteCardById,
   getCards,
   removeLikeCard,
-  setCardLike
+  setCardLike,
 } from '../controllers/cards';
 
 const cardRouter = Router();

@@ -19,7 +19,7 @@ export const createCard = (request: Request, response: Response, next: NextFunct
 
   Card.create({ name, link, owner: USER_ID })
     .then((card) => {
-      response.send(card);
+      response.status(201).send(card);
     })
     .catch((error) => {
       const errorToThrow =

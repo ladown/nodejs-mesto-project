@@ -31,5 +31,6 @@
     "no-unused-vars": ["error", { "args": "none" }],
     "operator-linebreak": "off",
     "indent": "off",
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}]
   },
 }

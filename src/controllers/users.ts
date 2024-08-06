@@ -74,7 +74,7 @@ export const updateUserProfile = (request: Request, response: Response, next: Ne
 export const updateUserAvatar = (request: Request, response: Response, next: NextFunction) => {
   const { avatar } = request.body;
 
-  User.findByIdAndUpdate(USER_ID, { avatar }, { new: true, translateAliases: true })
+  User.findByIdAndUpdate(USER_ID, { avatar }, { new: true })
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Пользователь с указанным _id не найден.');

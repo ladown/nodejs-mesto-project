@@ -7,7 +7,7 @@ import { USER_ID } from '../constants';
 export const getUsers = (request: Request, response: Response, next: NextFunction) => {
   User.find({})
     .then((users) => {
-      response.send({ data: users });
+      response.send(users);
     })
     .catch((error) => {
       next(error);
@@ -20,7 +20,7 @@ export const getUserById = (request: Request, response: Response, next: NextFunc
       if (!user) {
         throw new NotFoundError('Пользователь по указанному _id не найден.');
       } else {
-        response.send({ data: user });
+        response.send(user);
       }
     })
     .catch((error) => {
@@ -38,7 +38,7 @@ export const createUser = (request: Request, response: Response, next: NextFunct
 
   User.create({ name, about, avatar })
     .then((user) => {
-      response.send({ data: user });
+      response.send(user);
     })
     .catch((error) => {
       const errorToThrow =
@@ -58,7 +58,7 @@ export const updateUserProfile = (request: Request, response: Response, next: Ne
       if (!user) {
         throw new NotFoundError('Пользователь с указанным _id не найден.');
       } else {
-        response.send({ data: user });
+        response.send(user);
       }
     })
     .catch((error) => {
@@ -79,7 +79,7 @@ export const updateUserAvatar = (request: Request, response: Response, next: Nex
       if (!user) {
         throw new NotFoundError('Пользователь с указанным _id не найден.');
       } else {
-        response.send({ data: user });
+        response.send(user);
       }
     })
     .catch((error) => {

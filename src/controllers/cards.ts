@@ -7,7 +7,7 @@ import { USER_ID } from '../constants';
 export const getCards = (_: Request, response: Response, next: NextFunction) => {
   Card.find({})
     .then((cards) => {
-      response.send({ data: cards });
+      response.send(cards);
     })
     .catch((error) => {
       next(error);
@@ -19,7 +19,7 @@ export const createCard = (request: Request, response: Response, next: NextFunct
 
   Card.create({ name, link, owner: USER_ID })
     .then((card) => {
-      response.send({ data: card });
+      response.send(card);
     })
     .catch((error) => {
       const errorToThrow =
@@ -37,7 +37,7 @@ export const deleteCardById = (request: Request, response: Response, next: NextF
       if (card.deletedCount === 0) {
         throw new NotFoundError('Карточка с указанным _id не найдена.');
       } else {
-        response.send({ data: card });
+        response.send({ message: 'Пост удалён' });
       }
     })
     .catch((error) => {

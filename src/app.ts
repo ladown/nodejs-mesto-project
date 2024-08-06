@@ -1,11 +1,12 @@
 import express from 'express';
 import { connect } from 'mongoose';
+import helmet from 'helmet';
 
 import type { Request, Response, NextFunction } from 'express';
 
 import usersRoute from './routes/users';
 import cardsRoute from './routes/cards';
-import { DefaultError } from './errors/index';
+import { DefaultError, NotFoundError } from './errors/index';
 
 const app = express();
 
@@ -13,9 +14,14 @@ connect('mongodb://localhost:27017/mestodb');
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(helmet());
 
 app.use('/users', usersRoute);
 app.use('/cards', cardsRoute);
+app.use('*', () => {
+  throw new NotFoundError('Запрашиваемый ресурс не найден');
+});
+
 app.use(
   (
     error: Error & { statusCode: number },

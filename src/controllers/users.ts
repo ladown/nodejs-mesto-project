@@ -38,7 +38,7 @@ export const createUser = (request: Request, response: Response, next: NextFunct
 
   User.create({ name, about, avatar })
     .then((user) => {
-      response.send(user);
+      response.status(201).send(user);
     })
     .catch((error) => {
       const errorToThrow =

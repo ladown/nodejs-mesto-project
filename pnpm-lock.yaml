@@ -14,6 +14,9 @@ importers:
       mongoose:
         specifier: ^6.5.0
         version: 6.13.0(@aws-sdk/client-sso-oidc@3.623.0(@aws-sdk/client-sts@3.623.0))
+      validator:
+        specifier: ^13.12.0
+        version: 13.12.0
     devDependencies:
       '@types/express':
         specifier: ^4.17.13
@@ -21,6 +24,9 @@ importers:
       '@types/node':
         specifier: ^18.6.3
         version: 18.19.43
+      '@types/validator':
+        specifier: ^13.12.0
+        version: 13.12.0
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.0.1
         version: 8.0.1(@typescript-eslint/parser@8.0.1(eslint@8.57.0)(typescript@4.9.5))(eslint@8.57.0)(typescript@4.9.5)
@@ -42,6 +48,9 @@ importers:
       eslint-plugin-import:
         specifier: ^2.26.0
         version: 2.29.1(@typescript-eslint/parser@8.0.1(eslint@8.57.0)(typescript@4.9.5))(eslint@8.57.0)
+      helmet:
+        specifier: ^7.1.0
+        version: 7.1.0
       husky:
         specifier: ^9.1.4
         version: 9.1.4
@@ -500,6 +509,9 @@ packages:
 
   '@types/strip-json-comments@0.0.30':
     resolution: {integrity: sha512-7NQmHra/JILCd1QqpSzl8+mJRc8ZHz3uDm8YV1Ks9IhK0epEiTw8aIErbvH9PI+6XbqhyIQy3462nEsn7UVzjQ==}
+
+  '@types/validator@13.12.0':
+    resolution: {integrity: sha512-nH45Lk7oPIJ1RVOF6JgFI6Dy0QpHEzq4QecZhvguxYPDwT8c93prCMqAtiIttm39voZ+DDR+qkNnMpJmMBRqag==}
 
   '@types/webidl-conversions@7.0.3':
     resolution: {integrity: sha512-CiJJvcRtIgzadHCYXw7dqEnMNRjhGZlYK05Mj9OyktqV8uVT8fD2BFOB7S1uwBE3Kj2Z+4UyPmFw/Ixgw/LAlA==}
@@ -1275,6 +1287,10 @@ packages:
   hasown@2.0.2:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
+
+  helmet@7.1.0:
+    resolution: {integrity: sha512-g+HZqgfbpXdCkme/Cd/mZkV0aV3BZZZSugecH03kl38m/Kmdx8jKjBikpDj2cr+Iynv4KpYEviojNdTJActJAg==}
+    engines: {node: '>=16.0.0'}
 
   homedir-polyfill@1.0.3:
     resolution: {integrity: sha512-eSmmWE5bZTK2Nou4g0AI3zZ9rswp7GRKoKXS1BLUkvPviOqs4YTN1djQIqrXy9k5gEtdLPy86JjRwsNM9tnDcA==}
@@ -2207,6 +2223,10 @@ packages:
 
   v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
+
+  validator@13.12.0:
+    resolution: {integrity: sha512-c1Q0mCiPlgdTVVVIJIrBuxNicYE+t/7oKeI9MWLj3fh/uq2Pxh/3eeWbVZ4OcGW1TUf53At0njHw5SMdA3tmMg==}
+    engines: {node: '>= 0.10'}
 
   vary@1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
@@ -3208,6 +3228,8 @@ snapshots:
 
   '@types/strip-json-comments@0.0.30': {}
 
+  '@types/validator@13.12.0': {}
+
   '@types/webidl-conversions@7.0.3': {}
 
   '@types/whatwg-url@8.2.2':
@@ -4194,6 +4216,8 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
+  helmet@7.1.0: {}
+
   homedir-polyfill@1.0.3:
     dependencies:
       parse-passwd: 1.0.0
@@ -5140,6 +5164,8 @@ snapshots:
     optional: true
 
   v8-compile-cache-lib@3.0.1: {}
+
+  validator@13.12.0: {}
 
   vary@1.1.2: {}
 

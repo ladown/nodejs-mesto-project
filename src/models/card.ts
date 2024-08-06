@@ -8,30 +8,35 @@ export interface ICard {
   createdAt: Date;
 }
 
-const cardSchema = new Schema<ICard>({
-  name: {
-    type: String,
-    minlength: 2,
-    maxlength: 30,
-    required: true,
+const cardSchema = new Schema<ICard>(
+  {
+    name: {
+      type: String,
+      required: [true, 'Поле "name" должно быть заполнено'],
+      minlength: [2, 'Минимальная длина поля "name" - 2'],
+      maxlength: [30, 'Максимальная длина поля "name" - 30'],
+    },
+    link: {
+      type: String,
+      required: [true, 'Поле "link" должно быть заполнено'],
+    },
+    owner: {
+      type: Schema.Types.ObjectId,
+      required: true,
+    },
+    likes: {
+      type: [Schema.Types.ObjectId],
+      default: [],
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now(),
+    },
   },
-  link: {
-    type: String,
-    required: true,
+  {
+    versionKey: false,
   },
-  owner: {
-    type: Schema.Types.ObjectId,
-    required: true,
-  },
-  likes: {
-    type: [Schema.Types.ObjectId],
-    default: [],
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now(),
-  },
-});
+);
 
 export default model<ICard>('card', cardSchema);

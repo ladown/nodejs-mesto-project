@@ -3,6 +3,7 @@ import type { NextFunction, Request, Response } from 'express';
 import Card from '../models/card';
 import { BadRequestError, NotFoundError } from '../errors/index';
 import { USER_ID } from '../constants';
+import generateValidationTextError from '../utils/generateValidationTextError';
 
 export const getCards = (_: Request, response: Response, next: NextFunction) => {
   Card.find({})
@@ -24,7 +25,9 @@ export const createCard = (request: Request, response: Response, next: NextFunct
     .catch((error) => {
       const errorToThrow =
         error.name === 'ValidationError'
-          ? new BadRequestError('Переданы некорректные данные при создании карточки.')
+          ? new BadRequestError(
+              `Переданы некорректные данные при создании карточки${error.errors ? `: ${generateValidationTextError(error.errors)}` : '.'}`,
+            )
           : error;
 
       next(errorToThrow);

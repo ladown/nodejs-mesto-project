@@ -3,6 +3,7 @@ import type { Request, Response, NextFunction } from 'express';
 import User from '../models/user';
 import { BadRequestError, NotFoundError } from '../errors/index';
 import { USER_ID } from '../constants';
+import generateValidationTextError from '../utils/generateValidationTextError';
 
 export const getUsers = (request: Request, response: Response, next: NextFunction) => {
   User.find({})
@@ -43,7 +44,9 @@ export const createUser = (request: Request, response: Response, next: NextFunct
     .catch((error) => {
       const errorToThrow =
         error.name === 'ValidationError'
-          ? new BadRequestError('Переданы некорректные данные при создании пользователя.')
+          ? new BadRequestError(
+              `Переданы некорректные данные при создании пользователя${error.errors ? `: ${generateValidationTextError(error.errors)}` : '.'}`,
+            )
           : error;
 
       next(errorToThrow);

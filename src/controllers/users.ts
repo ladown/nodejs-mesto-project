@@ -1,9 +1,10 @@
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 import type { Request, Response, NextFunction } from 'express';
 
 import User from '../models/user';
-import { BadRequestError, NotFoundError } from '../errors/index';
+import { BadRequestError, NotFoundError, UnauthorizedError } from '../errors/index';
 import { USER_ID } from '../constants';
 import generateValidationTextError from '../utils/generateValidationTextError';
 
@@ -51,7 +52,13 @@ export const createUser = (request: Request, response: Response, next: NextFunct
       }),
     )
     .then((user) => {
-      response.status(201).send(user);
+      response.status(201).send({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
+        _id: user._id,
+      });
     })
     .catch((error) => {
       const errorToThrow =
@@ -105,4 +112,39 @@ export const updateUserAvatar = (request: Request, response: Response, next: Nex
 
       next(errorToThrow);
     });
+};
+
+export const loginUser = (request: Request, response: Response, next: NextFunction) => {
+  const { email, password } = request.body;
+
+  User.findOne({ email })
+    .select('+password')
+    .then(async (user) => {
+      if (!user) {
+        throw new UnauthorizedError();
+      }
+
+      const isPasswordMatched = await bcrypt.compare(password, user.password);
+
+      if (!isPasswordMatched) {
+        throw new UnauthorizedError();
+      } else {
+        const jwtSecret = process.env.JWT_SECRET;
+
+        if (!jwtSecret) {
+          throw new NotFoundError('Не найдена переменная окружения "JWT_SECRET"');
+        } else {
+          const token = jwt.sign({ _id: user._id }, jwtSecret, {
+            expiresIn: '7d',
+          });
+          response
+            .cookie('jwt', token, {
+              maxAge: 604800000,
+              httpOnly: true,
+            })
+            .end();
+        }
+      }
+    })
+    .catch(next);
 };

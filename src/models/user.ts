@@ -34,7 +34,7 @@ const userSchema = new Schema<IUser>(
     },
     email: {
       type: String,
-      required: true,
+      required: [true, 'Поле "email" должно быть заполнено'],
       unique: true,
       validate: {
         validator: (emailValue: string) => isEmail(emailValue),
@@ -43,7 +43,7 @@ const userSchema = new Schema<IUser>(
     },
     password: {
       type: String,
-      required: true,
+      required: [true, 'Поле "password" должно быть заполнено'],
       select: false,
     },
   },

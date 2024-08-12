@@ -1,3 +1,5 @@
+import bcrypt from 'bcryptjs';
+
 import type { Request, Response, NextFunction } from 'express';
 
 import User from '../models/user';
@@ -35,9 +37,19 @@ export const getUserById = (request: Request, response: Response, next: NextFunc
 };
 
 export const createUser = (request: Request, response: Response, next: NextFunction) => {
-  const { name, about, avatar } = request.body;
+  const { name, about, avatar, email, password } = request.body;
 
-  User.create({ name, about, avatar })
+  bcrypt
+    .hash(password, 10)
+    .then((hashedPassword) =>
+      User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hashedPassword,
+      }),
+    )
     .then((user) => {
       response.status(201).send(user);
     })

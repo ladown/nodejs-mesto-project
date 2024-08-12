@@ -1,10 +1,13 @@
 import { model, Schema } from 'mongoose';
 import isURL from 'validator/lib/isURL';
+import isEmail from 'validator/lib/isEmail';
 
 export interface IUser {
   name: string;
   about: string;
   avatar: string;
+  email: string;
+  password: string;
 }
 
 const userSchema = new Schema<IUser>(
@@ -28,6 +31,19 @@ const userSchema = new Schema<IUser>(
         validator: (avatarValue: string) => isURL(avatarValue),
         message: 'Некорректный URL поля "avatar"',
       },
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      validate: {
+        validator: (emailValue: string) => isEmail(emailValue),
+        message: 'Некорректное значение поля "email"',
+      },
+    },
+    password: {
+      type: String,
+      required: true,
     },
   },
   {

@@ -6,6 +6,7 @@ import 'dotenv/config';
 
 import type { Request, Response, NextFunction } from 'express';
 
+import authMiddleware from './middlewares/auth';
 import usersRoute from './routes/users';
 import cardsRoute from './routes/cards';
 import { DefaultError, NotFoundError } from './errors/index';
@@ -22,6 +23,8 @@ app.use(cookieParser());
 
 app.post('/signin', loginUser);
 app.post('/signup', createUser);
+
+app.use(authMiddleware);
 
 app.use('/users', usersRoute);
 app.use('/cards', cardsRoute);

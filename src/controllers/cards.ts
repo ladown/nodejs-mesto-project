@@ -1,9 +1,10 @@
 import type { NextFunction, Request, Response } from 'express';
 
 import Card from '../models/card';
-import { BadRequestError, NotFoundError } from '../errors/index';
-import { USER_ID } from '../constants';
+import { BadRequestError, NotFoundError, UnauthorizedError } from '../errors/index';
 import generateValidationTextError from '../utils/generateValidationTextError';
+
+import type { ISessionRequest } from '../types/index';
 
 export const getCards = (_: Request, response: Response, next: NextFunction) => {
   Card.find({})
@@ -15,10 +16,16 @@ export const getCards = (_: Request, response: Response, next: NextFunction) => 
     });
 };
 
-export const createCard = (request: Request, response: Response, next: NextFunction) => {
+export const createCard = (request: ISessionRequest, response: Response, next: NextFunction) => {
   const { name, link } = request.body;
+  const requestUser = request.user;
+  const userId = typeof requestUser === 'string' ? requestUser : requestUser?._id;
 
-  Card.create({ name, link, owner: USER_ID })
+  if (!userId) {
+    next(new UnauthorizedError());
+  }
+
+  Card.create({ name, link, owner: userId })
     .then((card) => {
       response.status(201).send(card);
     })
@@ -53,8 +60,15 @@ export const deleteCardById = (request: Request, response: Response, next: NextF
     });
 };
 
-export const setCardLike = (request: Request, response: Response, next: NextFunction) => {
-  Card.findByIdAndUpdate(request.params.cardId, { $addToSet: { likes: USER_ID } }, { new: true })
+export const setCardLike = (request: ISessionRequest, response: Response, next: NextFunction) => {
+  const requestUser = request.user;
+  const userId = typeof requestUser === 'string' ? requestUser : requestUser?._id;
+
+  if (!userId) {
+    next(new UnauthorizedError());
+  }
+
+  Card.findByIdAndUpdate(request.params.cardId, { $addToSet: { likes: userId } }, { new: true })
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Передан несуществующий _id карточки.');
@@ -74,8 +88,19 @@ export const setCardLike = (request: Request, response: Response, next: NextFunc
     });
 };
 
-export const removeLikeCard = (request: Request, response: Response, next: NextFunction) => {
-  Card.findByIdAndUpdate(request.params.cardId, { $pull: { likes: USER_ID } }, { new: true })
+export const removeLikeCard = (
+  request: ISessionRequest,
+  response: Response,
+  next: NextFunction,
+) => {
+  const requestUser = request.user;
+  const userId = typeof requestUser === 'string' ? requestUser : requestUser?._id;
+
+  if (!userId) {
+    next(new UnauthorizedError());
+  }
+
+  Card.findByIdAndUpdate(request.params.cardId, { $pull: { likes: userId } }, { new: true })
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Передан несуществующий _id карточки.');

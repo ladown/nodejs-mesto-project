@@ -1,19 +1,16 @@
 import jwt from 'jsonwebtoken';
 
-import type { JwtPayload } from 'jsonwebtoken';
-import type { Request, Response, NextFunction } from 'express';
+import type { Response, NextFunction } from 'express';
 
 import { UnauthorizedError, NotFoundError } from '../errors/index';
 
-export interface SessionRequest extends Request {
-  user?: string | JwtPayload;
-}
+import type { ISessionRequest } from '../types/index';
 
 const extractBearerToken = (header: string) => {
   return header.replace('Bearer ', '');
 };
 
-export default (request: SessionRequest, response: Response, next: NextFunction) => {
+export default (request: ISessionRequest, response: Response, next: NextFunction) => {
   const { authorization } = request.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {

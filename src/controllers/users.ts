@@ -5,8 +5,26 @@ import type { Request, Response, NextFunction } from 'express';
 
 import User from '../models/user';
 import { BadRequestError, NotFoundError, UnauthorizedError } from '../errors/index';
-import { USER_ID } from '../constants';
 import generateValidationTextError from '../utils/generateValidationTextError';
+
+import type { ISessionRequest } from '../types/index';
+
+export const getUser = (request: ISessionRequest, response: Response, next: NextFunction) => {
+  const requestUser = request.user;
+  const userId = typeof requestUser === 'string' ? requestUser : requestUser?._id;
+
+  if (!userId) {
+    next(new UnauthorizedError());
+  }
+
+  User.findById(userId)
+    .then((user) => {
+      response.send(user);
+    })
+    .catch((error) => {
+      next(error);
+    });
+};
 
 export const getUsers = (request: Request, response: Response, next: NextFunction) => {
   User.find({})
@@ -72,10 +90,20 @@ export const createUser = (request: Request, response: Response, next: NextFunct
     });
 };
 
-export const updateUserProfile = (request: Request, response: Response, next: NextFunction) => {
+export const updateUserProfile = (
+  request: ISessionRequest,
+  response: Response,
+  next: NextFunction,
+) => {
   const { name, about } = request.body;
+  const requestUser = request.user;
+  const userId = typeof requestUser === 'string' ? requestUser : requestUser?._id;
 
-  User.findByIdAndUpdate(USER_ID, { name, about }, { new: true })
+  if (!userId) {
+    next(new UnauthorizedError());
+  }
+
+  User.findByIdAndUpdate(userId, { name, about }, { new: true })
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Пользователь с указанным _id не найден.');
@@ -93,10 +121,20 @@ export const updateUserProfile = (request: Request, response: Response, next: Ne
     });
 };
 
-export const updateUserAvatar = (request: Request, response: Response, next: NextFunction) => {
+export const updateUserAvatar = (
+  request: ISessionRequest,
+  response: Response,
+  next: NextFunction,
+) => {
   const { avatar } = request.body;
+  const requestUser = request.user;
+  const userId = typeof requestUser === 'string' ? requestUser : requestUser?._id;
 
-  User.findByIdAndUpdate(USER_ID, { avatar }, { new: true })
+  if (!userId) {
+    next(new UnauthorizedError());
+  }
+
+  User.findByIdAndUpdate(userId, { avatar }, { new: true })
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Пользователь с указанным _id не найден.');

@@ -9,7 +9,7 @@ import type { Request, Response, NextFunction } from 'express';
 import usersRoute from './routes/users';
 import cardsRoute from './routes/cards';
 import { DefaultError, NotFoundError } from './errors/index';
-import { loginUser } from './controllers/users';
+import { loginUser, createUser } from './controllers/users';
 
 const app = express();
 
@@ -21,6 +21,7 @@ app.use(helmet());
 app.use(cookieParser());
 
 app.post('/signin', loginUser);
+app.post('/signup', createUser);
 
 app.use('/users', usersRoute);
 app.use('/cards', cardsRoute);

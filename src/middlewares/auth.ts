@@ -11,9 +11,9 @@ const extractBearerToken = (header: string) => {
 };
 
 export default (request: ISessionRequest, response: Response, next: NextFunction) => {
-  const { authorization } = request.headers;
+  const { jwt: jwtKey } = request.cookies;
 
-  if (!authorization || !authorization.startsWith('Bearer ')) {
+  if (!jwtKey) {
     throw new UnauthorizedError();
   }
 
@@ -23,7 +23,7 @@ export default (request: ISessionRequest, response: Response, next: NextFunction
     throw new NotFoundError('Не найдена переменная окружения "JWT_SECRET"');
   }
 
-  const token = extractBearerToken(authorization);
+  const token = extractBearerToken(jwtKey);
   let payload;
 
   try {

@@ -29,15 +29,6 @@
     ],
     "no-underscore-dangle": ["error", { "allow": ["_id"] }],
     "no-unused-vars": ["error", { "args": "none" }],
-    "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
-    "no-param-reassign": [
-      "error",
-      {
-        "props": false
-      }
-    ],
-    "operator-linebreak": "off",
-    "indent": "off",
-    "implicit-arrow-linebreak": "off"
+    "import/no-extraneous-dependencies": ["error", { "devDependencies": true }]
   }
 }

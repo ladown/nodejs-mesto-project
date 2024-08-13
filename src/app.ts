@@ -7,6 +7,7 @@ import 'dotenv/config';
 
 import authMiddleware from './middlewares/auth';
 import errorHandling from './middlewares/error-handling';
+import rateLimit from './middlewares/rate-limit';
 import usersRoute from './routes/users';
 import cardsRoute from './routes/cards';
 import { NotFoundError } from './errors/index';
@@ -19,9 +20,10 @@ const app = express();
 
 connect('mongodb://localhost:27017/mestodb');
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(rateLimit);
 app.use(helmet());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use(requestLogger);

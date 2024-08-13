@@ -165,6 +165,7 @@ export const loginUser = (request: Request, response: Response, next: NextFuncti
             .cookie('jwt', token, {
               maxAge: 604800000,
               httpOnly: true,
+              sameSite: true,
             })
             .end();
         }

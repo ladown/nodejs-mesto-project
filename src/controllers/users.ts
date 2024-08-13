@@ -5,7 +5,6 @@ import type { Request, Response, NextFunction } from 'express';
 
 import User from '../models/user';
 import { BadRequestError, NotFoundError, UnauthorizedError } from '../errors/index';
-import generateValidationTextError from '../utils/generateValidationTextError';
 
 import type { ISessionRequest } from '../types/index';
 
@@ -21,9 +20,7 @@ export const getUser = (request: ISessionRequest, response: Response, next: Next
     .then((user) => {
       response.send(user);
     })
-    .catch((error) => {
-      next(error);
-    });
+    .catch(next);
 };
 
 export const getUsers = (request: Request, response: Response, next: NextFunction) => {
@@ -31,9 +28,7 @@ export const getUsers = (request: Request, response: Response, next: NextFunctio
     .then((users) => {
       response.send(users);
     })
-    .catch((error) => {
-      next(error);
-    });
+    .catch(next);
 };
 
 export const getUserById = (request: Request, response: Response, next: NextFunction) => {
@@ -78,16 +73,7 @@ export const createUser = (request: Request, response: Response, next: NextFunct
         _id: user._id,
       });
     })
-    .catch((error) => {
-      const errorToThrow =
-        error.name === 'ValidationError'
-          ? new BadRequestError(
-              `Переданы некорректные данные при создании пользователя${error.errors ? `: ${generateValidationTextError(error.errors)}` : '.'}`,
-            )
-          : error;
-
-      next(errorToThrow);
-    });
+    .catch(next);
 };
 
 export const updateUserProfile = (

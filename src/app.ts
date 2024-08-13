@@ -4,12 +4,11 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import 'dotenv/config';
 
-import type { Request, Response, NextFunction } from 'express';
-
 import authMiddleware from './middlewares/auth';
+import errorHandling from './middlewares/error-handling';
 import usersRoute from './routes/users';
 import cardsRoute from './routes/cards';
-import { DefaultError, NotFoundError } from './errors/index';
+import { NotFoundError } from './errors/index';
 import { loginUser, createUser } from './controllers/users';
 import { requestLogger, errorLogger } from './middlewares/logger';
 
@@ -37,18 +36,7 @@ app.use('*', () => {
 
 app.use(errorLogger);
 
-app.use(
-  (
-    error: Error & { statusCode: number },
-    request: Request,
-    response: Response,
-    _: NextFunction,
-  ) => {
-    const normalizedError = error.statusCode ? error : new DefaultError();
-
-    response.status(normalizedError.statusCode).send({ message: normalizedError.message });
-  },
-);
+app.use(errorHandling);
 
 app.listen(3000, () => {
   console.log('Server is listened on port 3000');

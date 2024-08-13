@@ -1,8 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 
 import Card from '../models/card';
-import { BadRequestError, NotFoundError, UnauthorizedError } from '../errors/index';
-import generateValidationTextError from '../utils/generateValidationTextError';
+import { BadRequestError, ForbiddenError, NotFoundError, UnauthorizedError } from '../errors/index';
 
 import type { ISessionRequest } from '../types/index';
 
@@ -11,9 +10,7 @@ export const getCards = (_: Request, response: Response, next: NextFunction) => 
     .then((cards) => {
       response.send(cards);
     })
-    .catch((error) => {
-      next(error);
-    });
+    .catch(next);
 };
 
 export const createCard = (request: ISessionRequest, response: Response, next: NextFunction) => {
@@ -29,26 +26,35 @@ export const createCard = (request: ISessionRequest, response: Response, next: N
     .then((card) => {
       response.status(201).send(card);
     })
-    .catch((error) => {
-      const errorToThrow =
-        error.name === 'ValidationError'
-          ? new BadRequestError(
-              `Переданы некорректные данные при создании карточки${error.errors ? `: ${generateValidationTextError(error.errors)}` : '.'}`,
-            )
-          : error;
-
-      next(errorToThrow);
-    });
+    .catch(next);
 };
 
-export const deleteCardById = (request: Request, response: Response, next: NextFunction) => {
-  Card.deleteOne({ _id: request.params.cardId })
+export const deleteCardById = (
+  request: ISessionRequest,
+  response: Response,
+  next: NextFunction,
+) => {
+  const requestUser = request.user;
+  const userId = typeof requestUser === 'string' ? requestUser : requestUser?._id;
+
+  if (!userId) {
+    next(new UnauthorizedError());
+  }
+
+  Card.findById(request.params.cardId)
     .then((card) => {
-      if (card.deletedCount === 0) {
-        throw new NotFoundError('Карточка с указанным _id не найдена.');
-      } else {
-        response.send({ message: 'Пост удалён' });
+      if (card?.owner.toString() !== userId) {
+        throw new ForbiddenError('Вы пытаетесь удалить чужую карточку');
       }
+    })
+    .then(() => {
+      Card.deleteOne({ _id: request.params.cardId }).then((card) => {
+        if (card.deletedCount === 0) {
+          throw new NotFoundError('Карточка с указанным _id не найдена.');
+        } else {
+          response.send({ message: 'Пост удалён' });
+        }
+      });
     })
     .catch((error) => {
       const errorToThrow =

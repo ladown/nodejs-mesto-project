@@ -1,47 +1,60 @@
 import type { NextFunction, Request, Response } from 'express';
 
 import Card from '../models/card';
-import { BadRequestError, NotFoundError } from '../errors/index';
-import { USER_ID } from '../constants';
-import generateValidationTextError from '../utils/generateValidationTextError';
+import { BadRequestError, ForbiddenError, NotFoundError, UnauthorizedError } from '../errors/index';
+
+import type { ISessionRequest } from '../types/index';
 
 export const getCards = (_: Request, response: Response, next: NextFunction) => {
   Card.find({})
     .then((cards) => {
       response.send(cards);
     })
-    .catch((error) => {
-      next(error);
-    });
+    .catch(next);
 };
 
-export const createCard = (request: Request, response: Response, next: NextFunction) => {
+export const createCard = (request: ISessionRequest, response: Response, next: NextFunction) => {
   const { name, link } = request.body;
+  const requestUser = request.user;
+  const userId = typeof requestUser === 'string' ? requestUser : requestUser?._id;
 
-  Card.create({ name, link, owner: USER_ID })
+  if (!userId) {
+    next(new UnauthorizedError());
+  }
+
+  Card.create({ name, link, owner: userId })
     .then((card) => {
       response.status(201).send(card);
     })
-    .catch((error) => {
-      const errorToThrow =
-        error.name === 'ValidationError'
-          ? new BadRequestError(
-              `Переданы некорректные данные при создании карточки${error.errors ? `: ${generateValidationTextError(error.errors)}` : '.'}`,
-            )
-          : error;
-
-      next(errorToThrow);
-    });
+    .catch(next);
 };
 
-export const deleteCardById = (request: Request, response: Response, next: NextFunction) => {
-  Card.deleteOne({ _id: request.params.cardId })
+export const deleteCardById = (
+  request: ISessionRequest,
+  response: Response,
+  next: NextFunction,
+) => {
+  const requestUser = request.user;
+  const userId = typeof requestUser === 'string' ? requestUser : requestUser?._id;
+
+  if (!userId) {
+    next(new UnauthorizedError());
+  }
+
+  Card.findById(request.params.cardId)
     .then((card) => {
-      if (card.deletedCount === 0) {
-        throw new NotFoundError('Карточка с указанным _id не найдена.');
-      } else {
-        response.send({ message: 'Пост удалён' });
+      if (card?.owner.toString() !== userId) {
+        throw new ForbiddenError('Вы пытаетесь удалить чужую карточку');
       }
+    })
+    .then(() => {
+      Card.deleteOne({ _id: request.params.cardId }).then((card) => {
+        if (card.deletedCount === 0) {
+          throw new NotFoundError('Карточка с указанным _id не найдена.');
+        } else {
+          response.send({ message: 'Пост удалён' });
+        }
+      });
     })
     .catch((error) => {
       const errorToThrow =
@@ -53,8 +66,15 @@ export const deleteCardById = (request: Request, response: Response, next: NextF
     });
 };
 
-export const setCardLike = (request: Request, response: Response, next: NextFunction) => {
-  Card.findByIdAndUpdate(request.params.cardId, { $addToSet: { likes: USER_ID } }, { new: true })
+export const setCardLike = (request: ISessionRequest, response: Response, next: NextFunction) => {
+  const requestUser = request.user;
+  const userId = typeof requestUser === 'string' ? requestUser : requestUser?._id;
+
+  if (!userId) {
+    next(new UnauthorizedError());
+  }
+
+  Card.findByIdAndUpdate(request.params.cardId, { $addToSet: { likes: userId } }, { new: true })
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Передан несуществующий _id карточки.');
@@ -74,8 +94,19 @@ export const setCardLike = (request: Request, response: Response, next: NextFunc
     });
 };
 
-export const removeLikeCard = (request: Request, response: Response, next: NextFunction) => {
-  Card.findByIdAndUpdate(request.params.cardId, { $pull: { likes: USER_ID } }, { new: true })
+export const removeLikeCard = (
+  request: ISessionRequest,
+  response: Response,
+  next: NextFunction,
+) => {
+  const requestUser = request.user;
+  const userId = typeof requestUser === 'string' ? requestUser : requestUser?._id;
+
+  if (!userId) {
+    next(new UnauthorizedError());
+  }
+
+  Card.findByIdAndUpdate(request.params.cardId, { $pull: { likes: userId } }, { new: true })
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Передан несуществующий _id карточки.');

@@ -2,6 +2,7 @@ import express from 'express';
 import { connect } from 'mongoose';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import { Joi, celebrate, errors } from 'celebrate';
 import 'dotenv/config';
 
 import authMiddleware from './middlewares/auth';
@@ -11,6 +12,8 @@ import cardsRoute from './routes/cards';
 import { NotFoundError } from './errors/index';
 import { loginUser, createUser } from './controllers/users';
 import { requestLogger, errorLogger } from './middlewares/logger';
+
+const { PORT = 3000 } = process.env;
 
 const app = express();
 
@@ -23,8 +26,29 @@ app.use(cookieParser());
 
 app.use(requestLogger);
 
-app.post('/signin', loginUser);
-app.post('/signup', createUser);
+app.post(
+  '/signin',
+  celebrate({
+    body: Joi.object().keys({
+      email: Joi.string().required().email(),
+      password: Joi.string().required(),
+    }),
+  }),
+  loginUser,
+);
+app.post(
+  '/signup',
+  celebrate({
+    body: Joi.object().keys({
+      email: Joi.string().required().email(),
+      password: Joi.string().required(),
+      name: Joi.string().min(2).max(30),
+      about: Joi.string().min(2).max(200),
+      avatar: Joi.string().required().uri(),
+    }),
+  }),
+  createUser,
+);
 
 app.use(authMiddleware);
 
@@ -35,9 +59,7 @@ app.use('*', () => {
 });
 
 app.use(errorLogger);
-
+app.use(errors());
 app.use(errorHandling);
 
-app.listen(3000, () => {
-  console.log('Server is listened on port 3000');
-});
+app.listen(PORT);

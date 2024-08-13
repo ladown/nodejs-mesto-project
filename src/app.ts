@@ -11,6 +11,7 @@ import usersRoute from './routes/users';
 import cardsRoute from './routes/cards';
 import { DefaultError, NotFoundError } from './errors/index';
 import { loginUser, createUser } from './controllers/users';
+import { requestLogger, errorLogger } from './middlewares/logger';
 
 const app = express();
 
@@ -20,6 +21,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(helmet());
 app.use(cookieParser());
+
+app.use(requestLogger);
 
 app.post('/signin', loginUser);
 app.post('/signup', createUser);
@@ -31,6 +34,8 @@ app.use('/cards', cardsRoute);
 app.use('*', () => {
   throw new NotFoundError('Запрашиваемый ресурс не найден');
 });
+
+app.use(errorLogger);
 
 app.use(
   (
